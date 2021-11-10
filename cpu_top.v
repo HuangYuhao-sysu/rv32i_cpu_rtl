@@ -17,7 +17,7 @@
 // Date                By              Version             Change Description
 // -----------------------------------------------------------------------------
 // 2021/11/02       Huangyh             1.0                 5 stage rv32i
-//
+// 2021/11/10       Huangyh             2.0                 just for FPGA
 // =============================================================================
 
 `timescale 1ns / 1ps
@@ -25,47 +25,18 @@
 
 module cpu_top (
     // Clock for cpu work.
-    input                       clk_cpu,
-    // Clock for when stall cpu, read data from pc, reg, i cache and d cache.
-    input                       clk_debug,
+    input                       clk,
 
     // Asynchronous reset active low, need to synchronize.
-    input                       rst_n_cpu_ext,
-    input                       rst_n_debug_ext,
+    input                       rst_n,
 
-    input   [`DEBUG_WIDTH-1:0]  debug,
-
-    // from external io to write and read i cache.
-    input   [`IADDR_WIDTH-1:0]  ext_icache_addr_i,
-    input   [`DATA_WIDTH-1:0]   ext_icache_wdata_i,
-
-    // external read reg enable.
-    input   [`RADDR_WIDTH-1:0]  ext_reg_raddr_i,
-
-    // external io to read dcache.
-    input   [`DADDR_WIDTH-1:0]  ext_dcache_raddr_i,
-
-    // read data to external.
-    output  [`PC_WIDTH-1:0]     ext_pc_o,
-    output  [`DATA_WIDTH-1:0]   ext_icache_rdata_o,
-    output  [`DATA_WIDTH-1:0]   ext_reg_rdata_o,
-    output  [`DATA_WIDTH-1:0]   ext_dcache_rdata_o
+    // just for build the cpu
+    output  [`PC_WIDTH-1:0]     ext_pc
 );
 
 // =========================================================================== \
 // ============================= Internal signals ============================
 // =========================================================================== /
-
-//==============================================================================
-// top level rst signals
-//==============================================================================
-wire                            rst_n_cpu;
-wire                            rst_n_debug;
-
-//==============================================================================
-// clk mux
-//==============================================================================
-wire                            clk_mux;
 
 //==============================================================================
 // 5 stage rv32i cpu instance -> pc signals definition
@@ -193,134 +164,30 @@ wire    [`DATA_WIDTH-1:0]       rs1_data;
 wire    [`DATA_WIDTH-1:0]       rs2_data;
 
 //==============================================================================
-// 5 stage rv32i cpu instance -> i cache access signals definition
-//==============================================================================
-wire                            icache_ceb;
-wire                            icache_web;
-wire    [`IADDR_WIDTH-1:0]      icache_addr;
-
-//==============================================================================
 // 5 stage rv32i cpu instance -> d cache access signals definition
 //==============================================================================
-wire                            dcache_ceb;
-wire                            dcache_web;
-wire    [`DATA_WIDTH-1:0]       dcache_bweb;
-wire    [`DADDR_WIDTH-1:0]      dcache_addr;
 wire    [`DATA_WIDTH-1:0]       dcache_dout;
 
-
 //==============================================================================
-// cpu io control signals definition -> io_control
+// clk signal definition
 //==============================================================================
-wire    [`IADDR_WIDTH-1:0]      ext_icache_addr;
-wire                            ext_icache_ceb;
-wire                            ext_icache_web;
-wire    [`DATA_WIDTH-1:0]       ext_icache_wdata;
-wire    [`RADDR_WIDTH-1:0]      ext_reg_rs2;
-wire                            ext_reg_read2;
-wire    [`DADDR_WIDTH-1:0]      ext_dcache_addr;
-wire                            ext_dcache_ceb;
-wire                            ext_dcache_web;
-wire    [`DATA_WIDTH-1:0]       ext_dcache_bweb;
+wire                            clk_cpu;
 
 // =========================================================================== \
 // --------------------------------- Main Code ---------------------------------
 // =========================================================================== /
 
 //==============================================================================
-// async rst and sync release module
+// output and signal assign
 //==============================================================================
-async_rst u0_async_rst(
-    .clk     ( clk_cpu       ),
-    .rst_n_i ( rst_n_cpu_ext ),
-    .rst_n_o ( rst_n_cpu     )
-);
-
-async_rst u1_async_rst(
-    .clk     ( clk_debug       ),
-    .rst_n_i ( rst_n_debug_ext ),
-    .rst_n_o ( rst_n_debug     )
-);
-
-//==============================================================================
-// clk mux module
-//==============================================================================
-clk_mux u_clk_mux(
-    .clk_cpu     ( clk_cpu     ),
-    .clk_debug   ( clk_debug   ),
-    .rst_n_cpu   ( rst_n_cpu   ),
-    .rst_n_debug ( rst_n_debug ),
-    .debug       ( debug       ),
-    .clk_mux     ( clk_mux     )
-);
-
-//==============================================================================
-// for external write i cache, read pc, i cache, regfile and d cache.
-//==============================================================================
-io_control u_io_control(
-    .clk            ( clk_debug          ),
-    .rst_n          ( rst_n_debug        ),
-    .debug          ( debug              ),
-    .pc_i           ( pc                 ),
-    .icache_rdata_i ( instruction        ),
-    .reg_rdata_i    ( rs2_data           ),
-    .dcache_rdata_i ( dcache_dout        ),
-    .icache_addr_i  ( ext_icache_addr_i  ),
-    .icache_wdata_i ( ext_icache_wdata_i ),
-    .reg_raddr_i    ( ext_reg_raddr_i    ),
-    .dcache_raddr_i ( ext_dcache_raddr_i ),
-    .pc_o           ( ext_pc_o           ),
-    .icache_rdata_o ( ext_icache_rdata_o ),
-    .reg_rdata_o    ( ext_reg_rdata_o    ),
-    .dcache_rdata_o ( ext_dcache_rdata_o ),
-    .icache_addr_o  ( ext_icache_addr    ),
-    .icache_ceb_o   ( ext_icache_ceb     ),
-    .icache_web_o   ( ext_icache_web     ),
-    .icache_wdata_o ( ext_icache_wdata   ),
-    .reg_raddr_o    ( ext_reg_rs2        ),
-    .reg_read_o     ( ext_reg_read2      ),
-    .dcache_raddr_o ( ext_dcache_addr    ),
-    .dcache_ceb_o   ( ext_dcache_ceb     ),
-    .dcache_bweb_o  ( ext_dcache_bweb    )
-);
-
-//==============================================================================
-// mux i cache, regfile and d cache control signals, if they from cpu or ext.
-//==============================================================================
-cpu_state_mux u_cpu_state_mux(
-    .debug           ( debug           ),
-    .int_icache_ceb  ( if_icache_ceb   ),
-    .int_icache_web  ( if_icache_web   ),
-    .int_icache_addr ( pc_aligned      ),
-    .ext_icache_ceb  ( ext_icache_ceb  ),
-    .ext_icache_web  ( ext_icache_web  ),
-    .ext_icache_addr ( ext_icache_addr ),
-    .int_reg_read2   ( id_reg_read2    ),
-    .int_reg_rs2     ( id_reg_rs2      ),
-    .ext_reg_read2   ( ext_reg_read2   ),
-    .ext_reg_rs2     ( ext_reg_rs2     ),
-    .int_dcache_ceb  ( mem_dcache_ceb  ),
-    .int_dcache_bweb ( mem_dcache_bweb ),
-    .int_dcache_addr ( mem_dcache_addr ),
-    .ext_dcache_ceb  ( ext_dcache_ceb  ),
-    .ext_dcache_bweb ( ext_dcache_bweb ),
-    .ext_dcache_addr ( ext_dcache_addr ),
-    .icache_ceb      ( icache_ceb      ),
-    .icache_web      ( icache_web      ),
-    .icache_addr     ( icache_addr     ),
-    .reg_read2       ( reg_read2       ),
-    .reg_rs2         ( reg_rs2         ),
-    .dcache_ceb      ( dcache_ceb      ),
-    .dcache_bweb     ( dcache_bweb     ),
-    .dcache_addr     ( dcache_addr     )
-);
+assign ext_pc       = pc;
 
 //==============================================================================
 // 5 stage rv32i cpu instance -> pc, cpu state
 //==============================================================================
 program_counter u_program_counter(
     .clk       ( clk_cpu   ),
-    .rst_n     ( rst_n_cpu ),
+    .rst_n     ( rst_n     ),
     .target_pc ( target_pc ),
     .pc_src    ( pc_src    ),
     .stall     ( stall     ),
@@ -333,8 +200,7 @@ program_counter u_program_counter(
 instruction_fetch u_instruction_fetch(
     .pc         ( pc            ),
     .pc_aligned ( pc_aligned    ),
-    .ceb        ( if_icache_ceb ),
-    .web        ( if_icache_web )
+    .ceb        ( if_icache_ceb )
 );
 
 //==============================================================================
@@ -342,7 +208,7 @@ instruction_fetch u_instruction_fetch(
 //==============================================================================
 stage_ifid u_stage_ifid(
     .clk           ( clk_cpu          ),
-    .rst_n         ( rst_n_cpu        ),
+    .rst_n         ( rst_n            ),
     .current_pc_i  ( pc               ),
     .instruction_i ( instruction      ),
     .stall         ( stall            ),
@@ -392,7 +258,6 @@ hardzard_detection u_hardzard_detection(
     .exmem_reg_rd   ( exmem_reg_dest   ),
     .exmem_mem_read ( exmem_mem_read   ),
     .instruction    ( ifid_instruction ),
-    .debug          ( debug            ),
     .env_exception  ( env_exception    ),
     .bp_exception   ( bp_exception     ),
     .stall          ( stall            )
@@ -430,8 +295,7 @@ id_branch_jump u_id_branch_jump(
 //==============================================================================
 // 5 stage rv32i cpu instance -> for manage control signals that can change the
 // cpu architecture state, including alu src, alu op, reg write, mem read write
-// mode, mem to reg. when hazard detected or debug mode enable, these control
-// signals should be zero.
+// mode, mem to reg. when hazard detected, these control, signals should be zero
 //==============================================================================
 id_control u_id_control(
     .id_alu_src     ( id_alu_src          ),
@@ -456,7 +320,7 @@ id_control u_id_control(
 //==============================================================================
 stage_idex u_stage_idex(
     .clk           ( clk_cpu            ),
-    .rst_n         ( rst_n_cpu          ),
+    .rst_n         ( rst_n              ),
     .pc_i          ( ifid_pc            ),
     .branch_jump_i ( id_branch_jump     ),
     .alu_src_i     ( control_alu_src    ),
@@ -518,7 +382,7 @@ execution u_execution(
 //==============================================================================
 stage_exmem u_stage_exmem(
     .clk          ( clk_cpu          ),
-    .rst_n        ( rst_n_cpu        ),
+    .rst_n        ( rst_n            ),
     .mem_write_i  ( idex_mem_write   ),
     .mem_read_i   ( idex_mem_read    ),
     .mem_mode_i   ( idex_mem_mode    ),
@@ -561,7 +425,7 @@ memory_access u_memory_access(
 //==============================================================================
 stage_memwb u_stage_memwb(
     .clk          ( clk_cpu          ),
-    .rst_n        ( rst_n_cpu        ),
+    .rst_n        ( rst_n            ),
     .mem_to_reg_i ( exmem_mem_to_reg ),
     .rd_i         ( exmem_reg_dest   ),
     .alu_result_i ( exmem_alu_result ),
@@ -591,7 +455,7 @@ writeback u_writeback(
 //==============================================================================
 regfile u_regfile(
     .clk      ( clk_cpu      ),
-    .rst_n    ( rst_n_cpu    ),
+    .rst_n    ( rst_n        ),
     .rs1_addr ( id_reg_rs1   ),
     .rs2_addr ( reg_rs2      ),
     .rs1_en   ( id_reg_read1 ),
@@ -605,24 +469,27 @@ regfile u_regfile(
 
 
 //==============================================================================
-// Vivado IP i cache and d cache
+// Vivado IP i cache, d cache, mcmm
 //==============================================================================
 i_cache u_i_cache(
-    .addra ( icache_addr      ),
-    .clka  ( clk_mux          ),
-    .dina  ( ext_icache_wdata ),
+    .addra ( pc_aligned       ),
+    .clka  ( clk_cpu          ),
     .douta ( instruction      ),
-    .ena   ( icache_ceb       ),
-    .wea   ( icache_web       )
+    .ena   ( if_icache_ceb    )
 );
 
 d_cache u_d_cache(
-    .addra ( dcache_addr      ),
-    .clka  ( clk_mux          ),
+    .addra ( mem_dcache_addr  ),
+    .clka  ( clk_cpu          ),
     .dina  ( mem_dcache_wdata ),
     .douta ( dcache_dout      ),
-    .ena   ( dcache_ceb       ),
-    .wea   ( dcache_bweb      )
+    .ena   ( mem_dcache_ceb   ),
+    .wea   ( mem_dcache_bweb  )
+);
+
+clk_wiz u_clk_wiz(
+    .clk_in1  ( clk ),
+    .clk_out1 ( clk_cpu )
 );
 
 endmodule

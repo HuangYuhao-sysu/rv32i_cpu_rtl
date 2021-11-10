@@ -28,8 +28,7 @@ module instruction_fetch (
 
     output  [`IADDR_WIDTH-1:0]  pc_aligned, // aligned pc to access i_cache
 
-    output                      ceb,
-    output                      web
+    output                      ceb
 );
 
 // =========================================================================== \
@@ -47,7 +46,6 @@ reg [`PC_WIDTH-1:0]     pc_mask;
 //==============================================================================
 assign pc_aligned = pc_aligned_reg;
 assign ceb = `CHIP_EN;
-assign web = `CHIP_WDIS;
 
 always @(*) begin
     pc_mask         =   (pc & `PC_ALIGNED_MASK);

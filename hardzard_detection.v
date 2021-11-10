@@ -47,8 +47,6 @@ module hardzard_detection (
     // decide if a jumpbranch or add addi store etc.
     input   [`DATA_WIDTH-1:0]   instruction,
 
-    input   [`DEBUG_WIDTH-1:0]  debug,
-
     input                       env_exception,
     input                       bp_exception,
 
@@ -72,7 +70,7 @@ assign stall    = stall_reg;
 assign opcode   = instruction[6:0];
 
 //==============================================================================
-// Stall signals generate -> when enviroment or breakpoint exception or debug 
+// Stall signals generate -> when enviroment or breakpoint exception 
 // mode enable. We need unconditional stall. And then When idex_mem_read enable
 // and idex_reg_rd == id_rs1 and read1 enable or idex_reg_rd == id_rs2 and read2
 // enable. We need stall for the data hazard. When opcode == JARL or B and 
@@ -88,10 +86,6 @@ always @(*) begin
     end
 
     else if (bp_exception == `BP_EXC) begin
-        stall_reg   =   `STALL_EN;
-    end
-
-    else if (debug != `DEBUG_DIS) begin
         stall_reg   =   `STALL_EN;
     end
 
