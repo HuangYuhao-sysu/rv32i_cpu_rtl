@@ -1,0 +1,38 @@
+冒泡排序
+0:      01700313    addi,   r6,     zero,   017;    //  23
+4:      01400393    addi,   r7,     zero,   014;    //  20
+8:      00200413    addi,   r8,     zero,   002;    //  2
+12:     fff00493    addi,   r9,     zero,   fff;    //  -1
+16:     fe700513    addi,   r10,    zero,   fe7;    //  -25
+20:     01000593    addi,   r11,    zero,   010;    //  16
+24:     00000613    addi,   r12,    zero,   000;    //  0
+28:     ff500693    addi,   r13,    zero,   ff5;    //  -11
+32:     ffc00713    addi,   r14,    zero,   ffc;    //  -4
+36:     00700793    addi,   r15,    zero,   007;    //  7
+40:     00601023    sh,     zero,   r6,     0;      //  mem[1-0]    23
+44:     00701123    sh,     zero,   r7,     2;      //  mem[3-2]    20
+48:     00801223    sh,     zero,   r8,     4;      //  mem[5-4]    2
+52:     00901323    sh,     zero,   r9,     6;      //  mem[7-6]    -1
+56:     00a01423    sh,     zero,   r10,    8;      //  mem[9-8]    -25
+60      00b01523    sh,     zero,   r11,    10;     //  mem[11-10]  16
+64      00c01623    sh,     zero,   r12,    12;     //  mem[13-12]  0
+68      00d01723    sh,     zero,   r13,    14;     //  mem[15-14]  -11
+72      00e01823    sh,     zero,   r14,    16;     //  mem[17-16]  -4
+76      00f01923    sh,     zero,   r15,    18;     //  mem[19-18]  7
+80:     01200113    addi,   r2,     zero,   18;     //  for outside loops
+84:     00000193    addi,   r3,     zero,   0;      //  for inside loops
+88:     00015463    bge,    r2,     zero,   8;      //  compare, not finished and jump to 96
+92:     040000e7    jalr    r1,     zero,   64;     //  finished and jump to end
+96:     0021a233    slt     r4,     r3,     r2;     //  r3 < r2 then set r4
+100:    02020063    beq     zero,   r4,     32;     //  finish once inside loop, jump to 132
+104:    00019283    lh      r5,     r3,     0;      //  r5 <- mem[r3+0]
+108:    00219303    lh      r6,     r3,     2;      //  r6 <- mem[r3+2]
+112:    0062c663    blt     r5,     r6,     12;     //  r5 < r6, then jump to 124
+116:    00619023    sh      r3,     r6,     0;      //  mem[r3+0] <- r6
+120:    00519123    sh      r3,     r5,     2;      //  mem[r3+2] <- r5
+124:    00218193    addi    r3,     r3,     2;      //  r3 + 2 for next compare
+128:    fe1ff0ef    jal     r1,     -32             //  jump to 96
+132:    00000193    addi    r3,     zero,   0;      //  reset r3 for next out loop
+136:    ffe10113    addi    r2,     r2,     -2;     //  outside loop -2
+140:    fcdff0ef    jal     r1,     -52;            //  jump to 88
+144:    00000013    nop                             //  finisheds
