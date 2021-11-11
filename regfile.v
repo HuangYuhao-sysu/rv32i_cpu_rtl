@@ -79,7 +79,7 @@ always @(posedge clk or negedge rst_n) begin
 end
 
 //==============================================================================
-// read logic, comb
+// read logic, comb, including forwarding
 //==============================================================================
 always @(*) begin
     if (rs1_en == `REG_S1RD_EN) begin
