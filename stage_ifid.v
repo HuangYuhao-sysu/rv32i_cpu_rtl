@@ -41,19 +41,8 @@ module stage_ifid (
 );
 
 // =========================================================================== \
-// ============================== Define parameter ===========================
-// =========================================================================== /
-localparam NORMAL   = 2'd0; // normal transmit pc and instruction
-localparam STALL    = 2'd1; // stall for one cycle
-localparam FLUSH0   = 2'd2; // flush ifid instruction
-localparam FLUSH1   = 2'd3; // flush i cache instruction
-
-// =========================================================================== \
 // ============================= Internal signals ============================
 // =========================================================================== /
-reg [`IFIDSM_WIDTH-1:0] current_state;
-reg [`IFIDSM_WIDTH-1:0] next_state;
-
 reg [`PC_WIDTH-1:0]     current_pc_o_reg;
 reg [`DATA_WIDTH-1:0]   instruction_o_reg;
 
@@ -68,59 +57,7 @@ assign current_pc_o = current_pc_o_reg;
 assign instruction_o = instruction_o_reg;
 
 //==============================================================================
-// state transform
-//==============================================================================
-always @(posedge clk or negedge rst_n) begin
-    if (rst_n == `RST_ACTIVE) begin
-        // reset
-        current_state <= NORMAL;
-    end
-
-    else begin
-        current_state <= next_state;
-    end
-end
-
-//==============================================================================
-// next state decode and output decode
-//==============================================================================
-always @(*) begin
-    case (current_state)
-        NORMAL: begin
-            case ({stall,flush})
-                2'b00:  next_state  =   NORMAL;
-                2'b01:  next_state  =   FLUSH0;
-                2'b10:  next_state  =   STALL;
-                2'b11:  next_state  =   STALL;
-            endcase
-        end
-
-        STALL: begin
-            case ({stall,flush})
-                2'b00:  next_state  =   NORMAL;
-                2'b01:  next_state  =   FLUSH0;
-                2'b10:  next_state  =   STALL;
-                2'b11:  next_state  =   STALL;
-            endcase
-        end
-
-        FLUSH0: begin
-            next_state  =   FLUSH1;
-        end
-
-        FLUSH1: begin
-            case ({stall,flush})
-                2'b00:  next_state  =   NORMAL;
-                2'b01:  next_state  =   FLUSH0;
-                2'b10:  next_state  =   STALL;
-                2'b11:  next_state  =   STALL;
-            endcase
-        end
-    endcase
-end
-
-//==============================================================================
-// state output for pc
+// data transmit
 //==============================================================================
 always @(posedge clk or negedge rst_n) begin
     if (rst_n == `RST_ACTIVE) begin
@@ -131,13 +68,12 @@ always @(posedge clk or negedge rst_n) begin
     // Regardless of stall and flush， pc always get the input pc， when stall，
     // pc module will handle the real pc value. but for lower power gating
     // design. we should use stall and flush as clock gating enable signals.
+    else if (stall == `STALL_EN || flush == `FLUSH_EN) begin
+        current_pc_o_reg    <=  current_pc_o_reg;
+    end
+    
     else begin
-        case (next_state)
-            NORMAL: current_pc_o_reg    <=  current_pc_i;
-            STALL:  current_pc_o_reg    <=  current_pc_o_reg;
-            FLUSH0: current_pc_o_reg    <=  current_pc_o_reg;
-            FLUSH1: current_pc_o_reg    <=  current_pc_o_reg;
-        endcase
+        current_pc_o_reg    <=  current_pc_i;
     end
 end
 
@@ -147,14 +83,19 @@ always @(posedge clk or negedge rst_n) begin
         instruction_o_reg   <=  `ZERO;
     end
 
-    // we need to flush two instruction when jump or branch happended
+    // stall caused by data hazard, flush caused by jump or branch. stall need
+    // to hold the same instruction. 
+    else if (stall == `STALL_EN) begin
+        instruction_o_reg   <=  instruction_o_reg;
+    end
+
+    // flush is different, flush transmit NOP to avoid old instruction's affect.
+    else if (flush == `FLUSH_EN) begin
+        instruction_o_reg   <=  `NOP;
+    end
+
     else begin
-        case (next_state)
-            NORMAL: instruction_o_reg   <=  instruction_i;
-            STALL:  instruction_o_reg   <=  instruction_o_reg;
-            FLUSH0: instruction_o_reg   <=  `NOP;
-            FLUSH1: instruction_o_reg   <=  `NOP;
-        endcase
+        instruction_o_reg   <=  instruction_i;
     end
 end
 

@@ -26,21 +26,20 @@
 module memory_access (
     input   [`DATA_WIDTH-1:0]       mem_wdata,
 
-    // addr is 32bits, this module will convert it to a suitable value for memory
+    // addr is 32bits, this module will convert it to a suitable value for 
+    // memory, also cpu generate 4 bytes aligned address, this module convert
+    // it to memory real address for VIVADO IP BRAM is 32bit width for one
+    // address.
     input   [`DATA_WIDTH-1:0]       mem_addr,
 
     input   [`MEM_MODE_WIDTH-1:0]   mem_mode,
     input                           mem_write,
     input                           mem_read,
 
-    input   [`DATA_WIDTH-1:0]       dcache_rdata,
-
     output  [`DADDR_WIDTH-1:0]      dcache_addr,
     output                          dcache_ceb,
     output  [`DBWEB_WIDTH-1:0]      dcache_bweb,
-    output  [`DATA_WIDTH-1:0]       dcache_wdata,
-
-    output  [`DATA_WIDTH-1:0]       mem_rdata   // read data to reg, LOAD
+    output  [`DATA_WIDTH-1:0]       dcache_wdata
 );
 
 // =========================================================================== \
@@ -50,7 +49,6 @@ reg [`DADDR_WIDTH-1:0]  dcache_addr_reg;
 reg                     dcache_ceb_reg;
 reg [`DBWEB_WIDTH-1:0]  dcache_bweb_reg;
 reg [`DATA_WIDTH-1:0]   dcache_wdata_reg;
-reg [`DATA_WIDTH-1:0]   mem_rdata_reg;
 
 // =========================================================================== \
 // --------------------------------- Main Code ---------------------------------
@@ -63,7 +61,6 @@ assign  dcache_addr     =   dcache_addr_reg;
 assign  dcache_ceb      =   dcache_ceb_reg;
 assign  dcache_bweb     =   dcache_bweb_reg;
 assign  dcache_wdata    =   dcache_wdata_reg;
-assign  mem_rdata       =   mem_rdata_reg;
 
 //==============================================================================
 // dcache addr decode
@@ -71,7 +68,7 @@ assign  mem_rdata       =   mem_rdata_reg;
 always @(*) begin
     //  pyhsical address, directly discard out of range bits.
     if (mem_write == `MEM_WR_EN || mem_read == `MEM_RD_EN) begin
-        dcache_addr_reg =   mem_addr[`DADDR_WIDTH-1:0];
+        dcache_addr_reg =   (mem_addr[`DADDR_WIDTH-1:0] >> 2);
     end
 
     else begin
@@ -98,15 +95,28 @@ end
 always @(*) begin
     if (mem_write == `MEM_WR_EN) begin
         case (mem_mode)
-            `MEM_BYTE:  dcache_bweb_reg =   `CHIP_BWEB_BYTE;
-            `MEM_HWORD: dcache_bweb_reg =   `CHIP_BWEB_HWORD;
-            `MEM_WORD:  dcache_bweb_reg =   `CHIP_BWEB_WORD;
-            default :   dcache_bweb_reg =   `CHIP_BWEB_DIS;
+            `MEM_BYTE:  begin
+                case (mem_addr[1:0])    // for memory is 32bits once depth
+                    2'b00:      dcache_bweb_reg     =   `DC_BWEB_BYTE0;
+                    2'b01:      dcache_bweb_reg     =   `DC_BWEB_BYTE1;
+                    2'b10:      dcache_bweb_reg     =   `DC_BWEB_BYTE2;
+                    2'b11:      dcache_bweb_reg     =   `DC_BWEB_BYTE3;
+                endcase
+            end
+            `MEM_HWORD: begin
+                case (mem_addr[1:0])    // don't support write middle 2bytes
+                    2'b00:      dcache_bweb_reg     =   `DC_BWEB_HWORD0;
+                    2'b10:      dcache_bweb_reg     =   `DC_BWEB_HWORD2;
+                    default :   dcache_bweb_reg     =   `DC_BWEB_DIS;
+                endcase
+            end
+            `MEM_WORD:  dcache_bweb_reg =   `DC_BWEB_WORD;
+            default :   dcache_bweb_reg =   `DC_BWEB_DIS;
         endcase
     end
 
     else begin
-        dcache_bweb_reg =   `CHIP_BWEB_DIS;
+        dcache_bweb_reg =   `DC_BWEB_DIS;
     end
 end
 
@@ -115,40 +125,31 @@ end
 //==============================================================================
 always @(*) begin
     if (mem_write == `MEM_WR_EN) begin
-        dcache_wdata_reg    =   mem_wdata;
-    end
-
-    else begin
-        dcache_wdata_reg    =   `ZERO;
-    end
-end
-
-//==============================================================================
-// dcache memory read data decode
-//==============================================================================
-always @(*) begin
-    if (mem_read == `MEM_RD_EN) begin
         case (mem_mode)
-            // signed extend one byte
-            `MEM_BYTE:      mem_rdata_reg   =   {{24{dcache_rdata[7]}},
-                                                dcache_rdata[0+:8]};
-                                                
-            // signed extend half word
-            `MEM_HWORD:     mem_rdata_reg   =   {{16{dcache_rdata[15]}},
-                                                dcache_rdata[0+:16]};
-            
-            // signed extend word
-            `MEM_WORD:      mem_rdata_reg   =   dcache_rdata;
-            
-            // unsigned extend
-            `MEM_BYTEU:     mem_rdata_reg   =   {24'd0,dcache_rdata[0+:8]};
-            `MEM_HWORDU:    mem_rdata_reg   =   {16'd0,dcache_rdata[0+:16]};
-            default :       mem_rdata_reg   =   `ZERO;
+            `MEM_BYTE:  begin
+                case (mem_addr[1:0])
+                    2'b00:  dcache_wdata_reg    =   mem_wdata;
+                    2'b01:  dcache_wdata_reg    =   mem_wdata << 8;
+                    2'b10:  dcache_wdata_reg    =   mem_wdata << 16;
+                    2'b11:  dcache_wdata_reg    =   mem_wdata << 24;
+                endcase
+            end
+            `MEM_HWORD: begin
+                case (mem_addr[1:0])
+                    2'b00:  dcache_wdata_reg    =   mem_wdata;
+                    2'b10:  dcache_wdata_reg    =   mem_wdata << 16;
+                    default : dcache_wdata_reg  =   `ZERO;
+                endcase
+            end
+            `MEM_WORD:  begin
+                dcache_wdata_reg    =   mem_wdata;
+            end
+            default :   dcache_wdata_reg    =   `ZERO;
         endcase
     end
 
     else begin
-        mem_rdata_reg   =   `ZERO;
+        dcache_wdata_reg    =   `ZERO;
     end
 end
 

@@ -50,8 +50,6 @@ wire    [`PC_WIDTH-1:0]         pc;
 // 5 stage rv32i cpu instance -> if signals definition
 //==============================================================================
 wire    [`IADDR_WIDTH-1:0]      pc_aligned;
-wire                            if_icache_ceb;
-wire                            if_icache_web;
 
 //==============================================================================
 // 5 stage rv32i cpu instance -> ifid signals definition
@@ -135,13 +133,15 @@ wire                            exmem_reg_write;
 wire    [`DADDR_WIDTH-1:0]      mem_dcache_addr;
 wire                            mem_dcache_ceb;
 wire                            mem_dcache_web;
-wire    [`DATA_WIDTH-1:0]       mem_dcache_bweb;
+wire    [`DBWEB_WIDTH-1:0]      mem_dcache_bweb;
 wire    [`DATA_WIDTH-1:0]       mem_dcache_wdata;
 wire    [`DATA_WIDTH-1:0]       mem_rdata;
 
 //==============================================================================
 // 5 stage rv32i cpu instance -> memwb access signals definition
 //==============================================================================
+wire                            memwb_mem_read;
+wire    [`MEM_MODE_WIDTH-1:0]   memwb_mem_mode;
 wire                            memwb_mem_to_reg;
 wire    [`RADDR_WIDTH-1:0]      memwb_reg_dest;
 wire    [`DATA_WIDTH-1:0]       memwb_alu_result;
@@ -158,8 +158,6 @@ wire    [`DATA_WIDTH-1:0]       wb_reg_wdata;
 //==============================================================================
 // 5 stage rv32i cpu instance -> regfile access signals definition
 //==============================================================================
-wire    [`RADDR_WIDTH-1:0]      reg_rs2;
-wire                            reg_read2;
 wire    [`DATA_WIDTH-1:0]       rs1_data;
 wire    [`DATA_WIDTH-1:0]       rs2_data;
 
@@ -199,8 +197,7 @@ program_counter u_program_counter(
 //==============================================================================
 instruction_fetch u_instruction_fetch(
     .pc         ( pc            ),
-    .pc_aligned ( pc_aligned    ),
-    .ceb        ( if_icache_ceb )
+    .pc_aligned ( pc_aligned    )
 );
 
 //==============================================================================
@@ -247,7 +244,7 @@ instruction_decode u_instruction_decode(
 // B, J after LOAD, ADD RAW dependency, which need stall for 1, 1 or 2 cycles
 // respectively.
 //==============================================================================
-hardzard_detection u_hardzard_detection(
+hazard_detection u_hazard_detection(
     .id_rs1         ( id_reg_rs1       ),
     .id_read1       ( id_reg_read1     ),
     .id_rs2         ( id_reg_rs2       ),
@@ -412,12 +409,10 @@ memory_access u_memory_access(
     .mem_mode     ( exmem_mem_mode   ),
     .mem_write    ( exmem_mem_write  ),
     .mem_read     ( exmem_mem_read   ),
-    .dcache_rdata ( dcache_dout      ),
     .dcache_addr  ( mem_dcache_addr  ),
     .dcache_ceb   ( mem_dcache_ceb   ),
     .dcache_bweb  ( mem_dcache_bweb  ),
-    .dcache_wdata ( mem_dcache_wdata ),
-    .mem_rdata    ( mem_rdata        )
+    .dcache_wdata ( mem_dcache_wdata )
 );
 
 //==============================================================================
@@ -426,10 +421,14 @@ memory_access u_memory_access(
 stage_memwb u_stage_memwb(
     .clk          ( clk_cpu          ),
     .rst_n        ( rst_n            ),
+    .mem_read_i   ( exmem_mem_read   ),
+    .mem_mode_i   ( exmem_mem_mode   ),
     .mem_to_reg_i ( exmem_mem_to_reg ),
     .rd_i         ( exmem_reg_dest   ),
     .alu_result_i ( exmem_alu_result ),
     .reg_write_i  ( exmem_reg_write  ),
+    .mem_read_o   ( memwb_mem_read   ),
+    .mem_mode_o   ( memwb_mem_mode   ),
     .mem_to_reg_o ( memwb_mem_to_reg ),
     .rd_o         ( memwb_reg_dest   ),
     .alu_result_o ( memwb_alu_result ),
@@ -440,11 +439,13 @@ stage_memwb u_stage_memwb(
 // 5 stage rv32i cpu instance -> wb, combinational logic for writeback regfile.
 //==============================================================================
 writeback u_writeback(
+    .mem_read   ( memwb_mem_read   ),
+    .mem_mode   ( memwb_mem_mode   ),
     .mem_to_reg ( memwb_mem_to_reg ),
     .rd         ( memwb_reg_dest   ),
     .alu_result ( memwb_alu_result ),
     .reg_web    ( memwb_reg_write  ),
-    .mem_rdata  ( mem_rdata        ),
+    .mem_rdata  ( dcache_dout      ),
     .reg_write  ( wb_reg_write     ),
     .reg_waddr  ( wb_reg_waddr     ),
     .reg_wdata  ( wb_reg_wdata     )
@@ -457,9 +458,9 @@ regfile u_regfile(
     .clk      ( clk_cpu      ),
     .rst_n    ( rst_n        ),
     .rs1_addr ( id_reg_rs1   ),
-    .rs2_addr ( reg_rs2      ),
+    .rs2_addr ( id_reg_rs2   ),
     .rs1_en   ( id_reg_read1 ),
-    .rs2_en   ( reg_read2    ),
+    .rs2_en   ( id_reg_read2 ),
     .waddr    ( wb_reg_waddr ),
     .wdata    ( wb_reg_wdata ),
     .wen      ( wb_reg_write ),
@@ -472,10 +473,8 @@ regfile u_regfile(
 // Vivado IP i cache, d cache, mcmm
 //==============================================================================
 i_cache u_i_cache(
-    .addra ( pc_aligned       ),
-    .clka  ( clk_cpu          ),
-    .douta ( instruction      ),
-    .ena   ( if_icache_ceb    )
+    .a   ( pc_aligned  ),
+    .spo ( instruction )
 );
 
 d_cache u_d_cache(

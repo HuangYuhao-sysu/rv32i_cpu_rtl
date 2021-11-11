@@ -83,7 +83,14 @@ end
 //==============================================================================
 always @(*) begin
     if (rs1_en == `REG_S1RD_EN) begin
-        rs1_data_reg = regfile[rs1_addr];
+        if ((wen == `REG_WR_EN) && (waddr != `R_ZERO) && 
+            (waddr == rs1_addr)) begin
+            rs1_data_reg    =   wdata;
+        end
+
+        else begin
+            rs1_data_reg    =   regfile[rs1_addr];
+        end
     end
 
     else begin
@@ -93,7 +100,14 @@ end
 
 always @(*) begin
     if (rs2_en == `REG_S2RD_EN) begin
-        rs2_data_reg = regfile[rs2_addr];
+        if ((wen == `REG_WR_EN) && (waddr != `R_ZERO) && 
+            (waddr == rs2_addr)) begin
+            rs2_data_reg    =   wdata;
+        end
+
+        else begin
+            rs2_data_reg    =   regfile[rs2_addr];
+        end
     end
 
     else begin

@@ -24,11 +24,9 @@
 `include "define.vh"
 
 module instruction_fetch (
-    input   [`PC_WIDTH-1:0]     pc, // pc from pc module
+    input   [`PC_WIDTH-1:0]     pc,         // pc from pc module
 
-    output  [`IADDR_WIDTH-1:0]  pc_aligned, // aligned pc to access i_cache
-
-    output                      ceb
+    output  [`IADDR_WIDTH-1:0]  pc_aligned  // aligned pc to access i_cache
 );
 
 // =========================================================================== \
@@ -44,8 +42,9 @@ reg [`PC_WIDTH-1:0]     pc_mask;
 //==============================================================================
 // output reg assign
 //==============================================================================
-assign pc_aligned = pc_aligned_reg;
-assign ceb = `CHIP_EN;
+
+// for Vivado IP, we can't aceess by byte. so pc actually + 1 once time.
+assign pc_aligned = pc_aligned_reg >> 2;
 
 always @(*) begin
     pc_mask         =   (pc & `PC_ALIGNED_MASK);

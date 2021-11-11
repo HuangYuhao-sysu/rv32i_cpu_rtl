@@ -287,10 +287,14 @@
 `define BP_EXC          1'b1    // breakpoint exception
 `define BP_NEXC         1'b0    // breakpoint non-exception
 
-`define CHIP_BWEB_BYTE  4'b0001
-`define CHIP_BWEB_HWORD 4'b0011
-`define CHIP_BWEB_WORD  4'b1111
-`define CHIP_BWEB_DIS   4'b0000
+`define DC_BWEB_BYTE0   4'b0001
+`define DC_BWEB_BYTE1   4'b0010
+`define DC_BWEB_BYTE2   4'b0100
+`define DC_BWEB_BYTE3   4'b1000
+`define DC_BWEB_HWORD0  4'b0011
+`define DC_BWEB_HWORD2  4'b1100
+`define DC_BWEB_WORD    4'b1111
+`define DC_BWEB_DIS     4'b0000
 
 `define SEL_CPUCLK      1'b0
 `define SEL_DEBUGCLK    1'b1

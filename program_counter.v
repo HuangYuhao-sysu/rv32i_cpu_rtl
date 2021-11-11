@@ -60,7 +60,7 @@ always @(posedge clk or negedge rst_n) begin
     // one or two cycles, at this time, stall signal and pc_src signal will
     // active simultaneously. so stall priority is higher than pc src.
     else if (stall == `STALL_EN) begin
-        pc_reg  <=  pc_reg - `PC_INCREMT;
+        pc_reg  <=  pc_reg;
     end
 
     // branch and jump target pc
