@@ -22,7 +22,7 @@
 80:     01200113    addi,   r2,     zero,   18;     //  for outside loops
 84:     00000193    addi,   r3,     zero,   0;      //  for inside loops
 88:     00015463    bge,    r2,     zero,   8;      //  compare, not finished and jump to 96
-92:     040000e7    jalr    r1,     zero,   64;     //  finished and jump to end
+92:     090000e7    jalr    r1,     zero,   144;    //  finished and jump to end
 96:     0021a233    slt     r4,     r3,     r2;     //  r3 < r2 then set r4
 100:    02020063    beq     zero,   r4,     32;     //  finish once inside loop, jump to 132
 104:    00019283    lh      r5,     r3,     0;      //  r5 <- mem[r3+0]

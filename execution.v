@@ -136,7 +136,10 @@ always @(*) begin
         `ALU_XOR:   alu_result_reg  =   operand1 ^ operand2;
         `ALU_SLL:   alu_result_reg  =   operand1 << operand2[4:0];
         `ALU_SRL:   alu_result_reg  =   operand1 >> operand2[4:0];
-        `ALU_SRA:   alu_result_reg  =   operand1 >>> operand2[4:0];
+
+        // can't use $signed(operand1) >>> operand2[4:0];
+        `ALU_SRA:   alu_result_reg  =   (operand1 >> operand2[4:0]) | 
+                                ({32{operand1[31]}} << (32 - operand2[4:0]));
 
         // signed less than compare
         `ALU_LT:    begin

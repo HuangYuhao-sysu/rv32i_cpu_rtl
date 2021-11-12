@@ -55,44 +55,44 @@ initial begin
     $finish;
 end
 
-initial begin
-    #5000
-    $monitor("%h",u_cpu_top.u_d_cache.inst.native_mem_module.blk_mem_gen_v8_4_2_inst.memory[96]);
-    $monitor("%h",u_cpu_top.u_d_cache.inst.native_mem_module.blk_mem_gen_v8_4_2_inst.memory[97]);
-    $monitor("%h",u_cpu_top.u_d_cache.inst.native_mem_module.blk_mem_gen_v8_4_2_inst.memory[98]);
-    $monitor("%h",u_cpu_top.u_d_cache.inst.native_mem_module.blk_mem_gen_v8_4_2_inst.memory[99]);
-    $monitor("%h",u_cpu_top.u_d_cache.inst.native_mem_module.blk_mem_gen_v8_4_2_inst.memory[100]);
-    $monitor("%h",u_cpu_top.u_d_cache.inst.native_mem_module.blk_mem_gen_v8_4_2_inst.memory[101]);
-    $monitor("%h",u_cpu_top.u_d_cache.inst.native_mem_module.blk_mem_gen_v8_4_2_inst.memory[102]);
-    $monitor("%h",u_cpu_top.u_d_cache.inst.native_mem_module.blk_mem_gen_v8_4_2_inst.memory[103]);
-    $monitor("%h",u_cpu_top.u_d_cache.inst.native_mem_module.blk_mem_gen_v8_4_2_inst.memory[104]);
-    $monitor("%h",u_cpu_top.u_d_cache.inst.native_mem_module.blk_mem_gen_v8_4_2_inst.memory[105]);
-    $monitor("%h",u_cpu_top.u_d_cache.inst.native_mem_module.blk_mem_gen_v8_4_2_inst.memory[106]);
-    $monitor("%h",u_cpu_top.u_d_cache.inst.native_mem_module.blk_mem_gen_v8_4_2_inst.memory[107]);
-    $monitor("%h",u_cpu_top.u_d_cache.inst.native_mem_module.blk_mem_gen_v8_4_2_inst.memory[108]);
-    $monitor("%h",u_cpu_top.u_d_cache.inst.native_mem_module.blk_mem_gen_v8_4_2_inst.memory[109]);
-    $monitor("%h",u_cpu_top.u_d_cache.inst.native_mem_module.blk_mem_gen_v8_4_2_inst.memory[110]);
-    $monitor("%h",u_cpu_top.u_d_cache.inst.native_mem_module.blk_mem_gen_v8_4_2_inst.memory[111]);
-    $monitor("%h",u_cpu_top.u_d_cache.inst.native_mem_module.blk_mem_gen_v8_4_2_inst.memory[112]);
-    $monitor("%h",u_cpu_top.u_d_cache.inst.native_mem_module.blk_mem_gen_v8_4_2_inst.memory[113]);
-    $monitor("%h",u_cpu_top.u_d_cache.inst.native_mem_module.blk_mem_gen_v8_4_2_inst.memory[114]);
-    $monitor("%h",u_cpu_top.u_d_cache.inst.native_mem_module.blk_mem_gen_v8_4_2_inst.memory[115]);
-    $monitor("%h",u_cpu_top.u_d_cache.inst.native_mem_module.blk_mem_gen_v8_4_2_inst.memory[116]);
-    $monitor("%h",u_cpu_top.u_d_cache.inst.native_mem_module.blk_mem_gen_v8_4_2_inst.memory[117]);
-    $monitor("%h",u_cpu_top.u_d_cache.inst.native_mem_module.blk_mem_gen_v8_4_2_inst.memory[118]);
-    $monitor("%h",u_cpu_top.u_d_cache.inst.native_mem_module.blk_mem_gen_v8_4_2_inst.memory[119]);
-    $monitor("%h",u_cpu_top.u_d_cache.inst.native_mem_module.blk_mem_gen_v8_4_2_inst.memory[120]);
-    $monitor("%h",u_cpu_top.u_d_cache.inst.native_mem_module.blk_mem_gen_v8_4_2_inst.memory[121]);
-    $monitor("%h",u_cpu_top.u_d_cache.inst.native_mem_module.blk_mem_gen_v8_4_2_inst.memory[122]);
-    $monitor("%h",u_cpu_top.u_d_cache.inst.native_mem_module.blk_mem_gen_v8_4_2_inst.memory[123]);
-    $monitor("%h",u_cpu_top.u_d_cache.inst.native_mem_module.blk_mem_gen_v8_4_2_inst.memory[124]);
-    $monitor("%h",u_cpu_top.u_d_cache.inst.native_mem_module.blk_mem_gen_v8_4_2_inst.memory[125]);
-    $monitor("%h",u_cpu_top.u_d_cache.inst.native_mem_module.blk_mem_gen_v8_4_2_inst.memory[126]);
-    $monitor("%h",u_cpu_top.u_d_cache.inst.native_mem_module.blk_mem_gen_v8_4_2_inst.memory[127]);
-    //$monitor("mem[128]  = %h",u_cpu_top.u_d_cache.inst.native_mem_module.blk_mem_gen_v8_4_2_inst.memory[128]);
-    //$monitor("mem[129]  = %h",u_cpu_top.u_d_cache.inst.native_mem_module.blk_mem_gen_v8_4_2_inst.memory[129]);
-    //$monitor("mem[130]  = %h",u_cpu_top.u_d_cache.inst.native_mem_module.blk_mem_gen_v8_4_2_inst.memory[130]);
-    //$monitor("mem[131]  = %h",u_cpu_top.u_d_cache.inst.native_mem_module.blk_mem_gen_v8_4_2_inst.memory[131]);
-end
+//initial begin
+//    #5000
+//    $monitor("%h",u_cpu_top.u_d_cache.inst.native_mem_module.blk_mem_gen_v8_4_2_inst.memory[96]);
+//    $monitor("%h",u_cpu_top.u_d_cache.inst.native_mem_module.blk_mem_gen_v8_4_2_inst.memory[97]);
+//    $monitor("%h",u_cpu_top.u_d_cache.inst.native_mem_module.blk_mem_gen_v8_4_2_inst.memory[98]);
+//    $monitor("%h",u_cpu_top.u_d_cache.inst.native_mem_module.blk_mem_gen_v8_4_2_inst.memory[99]);
+//    $monitor("%h",u_cpu_top.u_d_cache.inst.native_mem_module.blk_mem_gen_v8_4_2_inst.memory[100]);
+//    $monitor("%h",u_cpu_top.u_d_cache.inst.native_mem_module.blk_mem_gen_v8_4_2_inst.memory[101]);
+//    $monitor("%h",u_cpu_top.u_d_cache.inst.native_mem_module.blk_mem_gen_v8_4_2_inst.memory[102]);
+//    $monitor("%h",u_cpu_top.u_d_cache.inst.native_mem_module.blk_mem_gen_v8_4_2_inst.memory[103]);
+//    $monitor("%h",u_cpu_top.u_d_cache.inst.native_mem_module.blk_mem_gen_v8_4_2_inst.memory[104]);
+//    $monitor("%h",u_cpu_top.u_d_cache.inst.native_mem_module.blk_mem_gen_v8_4_2_inst.memory[105]);
+//    $monitor("%h",u_cpu_top.u_d_cache.inst.native_mem_module.blk_mem_gen_v8_4_2_inst.memory[106]);
+//    $monitor("%h",u_cpu_top.u_d_cache.inst.native_mem_module.blk_mem_gen_v8_4_2_inst.memory[107]);
+//    $monitor("%h",u_cpu_top.u_d_cache.inst.native_mem_module.blk_mem_gen_v8_4_2_inst.memory[108]);
+//    $monitor("%h",u_cpu_top.u_d_cache.inst.native_mem_module.blk_mem_gen_v8_4_2_inst.memory[109]);
+//    $monitor("%h",u_cpu_top.u_d_cache.inst.native_mem_module.blk_mem_gen_v8_4_2_inst.memory[110]);
+//    $monitor("%h",u_cpu_top.u_d_cache.inst.native_mem_module.blk_mem_gen_v8_4_2_inst.memory[111]);
+//    $monitor("%h",u_cpu_top.u_d_cache.inst.native_mem_module.blk_mem_gen_v8_4_2_inst.memory[112]);
+//    $monitor("%h",u_cpu_top.u_d_cache.inst.native_mem_module.blk_mem_gen_v8_4_2_inst.memory[113]);
+//    $monitor("%h",u_cpu_top.u_d_cache.inst.native_mem_module.blk_mem_gen_v8_4_2_inst.memory[114]);
+//    $monitor("%h",u_cpu_top.u_d_cache.inst.native_mem_module.blk_mem_gen_v8_4_2_inst.memory[115]);
+//    $monitor("%h",u_cpu_top.u_d_cache.inst.native_mem_module.blk_mem_gen_v8_4_2_inst.memory[116]);
+//    $monitor("%h",u_cpu_top.u_d_cache.inst.native_mem_module.blk_mem_gen_v8_4_2_inst.memory[117]);
+//    $monitor("%h",u_cpu_top.u_d_cache.inst.native_mem_module.blk_mem_gen_v8_4_2_inst.memory[118]);
+//    $monitor("%h",u_cpu_top.u_d_cache.inst.native_mem_module.blk_mem_gen_v8_4_2_inst.memory[119]);
+//    $monitor("%h",u_cpu_top.u_d_cache.inst.native_mem_module.blk_mem_gen_v8_4_2_inst.memory[120]);
+//    $monitor("%h",u_cpu_top.u_d_cache.inst.native_mem_module.blk_mem_gen_v8_4_2_inst.memory[121]);
+//    $monitor("%h",u_cpu_top.u_d_cache.inst.native_mem_module.blk_mem_gen_v8_4_2_inst.memory[122]);
+//    $monitor("%h",u_cpu_top.u_d_cache.inst.native_mem_module.blk_mem_gen_v8_4_2_inst.memory[123]);
+//    $monitor("%h",u_cpu_top.u_d_cache.inst.native_mem_module.blk_mem_gen_v8_4_2_inst.memory[124]);
+//    $monitor("%h",u_cpu_top.u_d_cache.inst.native_mem_module.blk_mem_gen_v8_4_2_inst.memory[125]);
+//    $monitor("%h",u_cpu_top.u_d_cache.inst.native_mem_module.blk_mem_gen_v8_4_2_inst.memory[126]);
+//    $monitor("%h",u_cpu_top.u_d_cache.inst.native_mem_module.blk_mem_gen_v8_4_2_inst.memory[127]);
+//    //$monitor("mem[128]  = %h",u_cpu_top.u_d_cache.inst.native_mem_module.blk_mem_gen_v8_4_2_inst.memory[128]);
+//    //$monitor("mem[129]  = %h",u_cpu_top.u_d_cache.inst.native_mem_module.blk_mem_gen_v8_4_2_inst.memory[129]);
+//    //$monitor("mem[130]  = %h",u_cpu_top.u_d_cache.inst.native_mem_module.blk_mem_gen_v8_4_2_inst.memory[130]);
+//    //$monitor("mem[131]  = %h",u_cpu_top.u_d_cache.inst.native_mem_module.blk_mem_gen_v8_4_2_inst.memory[131]);
+//end
 
 endmodule
