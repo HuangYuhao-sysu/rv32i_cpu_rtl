@@ -33,7 +33,6 @@ module cpu_tb ();
 reg                     clk;
 reg                     rst_n;
 wire    [`PC_WIDTH-1:0] ext_pc;
-integer                 i;
 
 cpu_top u_cpu_top(
     .clk    ( clk    ),
