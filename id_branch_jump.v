@@ -32,6 +32,7 @@ module id_branch_jump (
     input   [`PC_WIDTH-1:0]     current_pc,
 
     // rs1 and rs2 from id module
+    input                       id_reg_read1,
     input   [`RADDR_WIDTH-1:0]  id_reg_rs1,
     input   [`RADDR_WIDTH-1:0]  id_reg_rs2,
     // for exmem dataforwarding
@@ -162,7 +163,13 @@ end
 //==============================================================================
 always @(*) begin
     if (branch_jump == `BJ_EN) begin
-        target_pc_reg   =   (current_pc + imm) & 32'hfffffffe;
+        if (alu_op == `ALU_ADDPC && id_reg_read1 == `REG_S1RD_EN) begin
+            target_pc_reg   =   (operand1 + imm) & 32'hfffffffe;
+        end
+
+        else begin
+            target_pc_reg   =   current_pc + imm;
+        end
     end
 
     else begin

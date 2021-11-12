@@ -273,6 +273,7 @@ id_branch_jump u_id_branch_jump(
     .alu_op          ( id_alu_op        ),
     .branch_jump     ( id_branch_jump   ),
     .current_pc      ( ifid_pc          ),
+    .id_reg_read1    ( id_reg_read1     ),
     .id_reg_rs1      ( id_reg_rs1       ),
     .id_reg_rs2      ( id_reg_rs2       ),
     .exmem_reg_dest  ( exmem_reg_dest   ),

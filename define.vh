@@ -140,28 +140,28 @@
 `define R_T2            5'd7    // Temporaries
 `define R_S0FP          5'd8    // Saved register/frame pointer
 `define R_S1            5'd9    // Saved register
-`define R_A0            5'd1    // Function arguments/return values
-`define R_A1            5'd1    // Function arguments/return values
-`define R_A2            5'd1    // Function arguments
-`define R_A3            5'd1    // Function arguments
-`define R_A4            5'd1    // Function arguments
-`define R_A5            5'd1    // Function arguments
-`define R_A6            5'd1    // Function arguments
-`define R_A7            5'd1    // Function arguments
-`define R_S2            5'd1    // Saved registers
-`define R_S3            5'd1    // Saved registers
-`define R_S4            5'd2    // Saved registers
-`define R_S5            5'd2    // Saved registers
-`define R_S6            5'd2    // Saved registers
-`define R_S7            5'd2    // Saved registers
-`define R_S8            5'd2    // Saved registers
-`define R_S9            5'd2    // Saved registers
-`define R_S10           5'd2    // Saved registers
-`define R_S11           5'd2    // Saved registers
-`define R_T3            5'd2    // Temporaries
-`define R_T4            5'd2    // Temporaries
-`define R_T5            5'd3    // Temporaries
-`define R_T6            5'd3    // Temporaries
+`define R_A0            5'd10   // Function arguments/return values
+`define R_A1            5'd11   // Function arguments/return values
+`define R_A2            5'd12   // Function arguments
+`define R_A3            5'd13   // Function arguments
+`define R_A4            5'd14   // Function arguments
+`define R_A5            5'd15   // Function arguments
+`define R_A6            5'd16   // Function arguments
+`define R_A7            5'd17   // Function arguments
+`define R_S2            5'd18   // Saved registers
+`define R_S3            5'd19   // Saved registers
+`define R_S4            5'd20   // Saved registers
+`define R_S5            5'd21   // Saved registers
+`define R_S6            5'd22   // Saved registers
+`define R_S7            5'd23   // Saved registers
+`define R_S8            5'd24   // Saved registers
+`define R_S9            5'd25   // Saved registers
+`define R_S10           5'd26   // Saved registers
+`define R_S11           5'd27   // Saved registers
+`define R_T3            5'd28   // Temporaries
+`define R_T4            5'd29   // Temporaries
+`define R_T5            5'd30   // Temporaries
+`define R_T6            5'd31   // Temporaries
 
 //==============================================================================
 // Exception code, reference RISC-V Volume II

@@ -36,3 +36,15 @@
 136:    ffe10113    addi    r2,     r2,     -2;     //  outside loop -2
 140:    fcdff0ef    jal     r1,     -52;            //  jump to 88
 144:    00000013    nop                             //  finisheds
+
+jalr测试
+0:      01400393    addi,   r7,     zero,   014;    //  20
+4:      000380e7    jalr,   r1,     r7,     0;      //  r1 <- 8, jump to 20
+8:      00200413    addi,   r8,     zero,   002;    //  2
+12:     fff00493    addi,   r9,     zero,   fff;    //  -1
+16:     fe700513    addi,   r10,    zero,   fe7;    //  -25
+20:     01000593    addi,   r11,    zero,   010;    //  16
+24:     00000613    addi,   r12,    zero,   000;    //  0
+28:     ff500693    addi,   r13,    zero,   ff5;    //  -11
+32:     ffc00713    addi,   r14,    zero,   ffc;    //  -4
+36:     00700793    addi,   r15,    zero,   007;    //  7
